@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +15,16 @@ class RevApplicationTests {
 	@Test
 	void contextLoads() {
 		
-		Question q = new Question();
-		q.setContent("오웅");
-		q.setSubject("오예스");
-		q.setCreateDate(LocalDateTime.now());
+		Optional<Question> q = this.questionRepository.findById(1);
+		System.out.println(q.get().getSubject());
+		System.out.println(q.get().getContent());
 		
-		this.questionRepository.save(q);
+//		Question q = new Question();
+//		q.setContent("주말은 언제 오나");
+//		q.setSubject("졸립다");
+//		q.setCreateDate(LocalDateTime.now());
+//		
+//		this.questionRepository.save(q);
 		
 	}
 

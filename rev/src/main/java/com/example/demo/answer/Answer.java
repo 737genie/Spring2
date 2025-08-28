@@ -1,38 +1,36 @@
-package com.example.demo;
+package com.example.demo.answer;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import com.example.demo.answer.Answer;
+import com.example.demo.Question;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
+
 
 @Getter
 @Setter
 @Entity
-public class Question {
+public class Answer {
 	
-	@Id // 기본 키 (not null + unique)
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	@Column(length=200)
-	private String subject;
 	
 	@Column(columnDefinition="TEXT")
 	private String content;
 	
 	private LocalDateTime createDate;
 	
-	@OneToMany(mappedBy="question", cascade = CascadeType.REMOVE) // 관계설정은 양쪽 다 해줘야함
-	private List<Answer> answerList;
+	//관계설정 필요
+	@ManyToOne
+	private Question question;
+	
 	
 }

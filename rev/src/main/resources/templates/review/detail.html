@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>질문</title>
+	<style>
+		body {
+			text-align: center;
+			width:50%;
+			margin:auto;
+		}
+		div {
+			margin-top:30px;
+			border: 3px solid #c2c2c2;
+			border-radius: 10px;
+		}
+		
+		h1{
+			margin:0;
+			padding:20px;
+			border-bottom: 1px solid #c2c2c2;
+		}
+		
+		button {
+			margin-top:10px;
+			border-radius: 10px;
+			border: 1px solid #999999;
+			text-decoration: none;
+			padding: 8px;
+			font-size: 15px;
+		}
+		.answer-button:hover {
+			color: #ffffff;
+			background-color: #4732ff;
+			border: 1px solid #4732ff;
+		}
+		
+		a{
+			margin-top: 20px;
+			font-size: 15px;
+		}
+		
+		.list {
+			margin-top:30px;
+			border:none;
+		}
+
+		
+	</style>
+</head>
+<body>
+
+	<div>
+		<h1 th:text="${question.subject}"></h1>
+		<h2 th:text="${question.content}"></h2>
+		<h6 th:text="${question.createDate}"></h6>
+	</div>
+	
+	<form th:action="@{|/answer/create|}" method="post">
+		<button type="submit" class="answer-button">답변 등록</button>
+	</form>
+
+	<div class="list">
+		<a th:href="@{/list}">목록으로 돌아가기</a>
+	</div>
+
+</body>
+</html>
+
