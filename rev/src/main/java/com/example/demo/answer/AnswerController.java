@@ -1,14 +1,17 @@
 package com.example.demo.answer;
 
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.Question;
 import com.example.demo.QuestionService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
@@ -19,10 +22,26 @@ public class AnswerController {
 	
 	private final QuestionService questionService;
 	
-	@PostMapping("/create")
-	public void answerCreate(@PathVariable("id") Integer id,
-			@RequestParam(value="content") String content) {
+	private final AnswerService answerService;
+	
+	@PostMapping("/create/{id}")
+	public String answerCreate(Model model, @PathVariable("id") Integer id,
+			@Valid AnswerForm answerForm,
+			BindingResult bindingResult) {
 		Question q = this.questionService.getQuestion(id);
+		
+		
+		
+		if(bindingResult.hasErrors()) {
+			model.addAttribute("question", q);
+			return "detail";
+		}
+		
+		this.answerService.create(q, answerForm.getContent());
+		
+		
+		
+		return String.format("redirect:/detail/%s", id);
 	}
 	
 }

@@ -1,60 +1,103 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>지식IN ^.~</title>
 	<style>
-		body{text-align: center;
-		width:70%;
-		margin:auto;
-	}
-		div{
-			display:flex;
-			justify-content: space-around;
-			border:1px solid #dddddd;
-			margin-top:10px;
-			border-radius: 10px;
-	}
-	a {
-		text-decoration: none;
-	}
-	a:visited {
-  color: #000000; /* 예: 검은색으로 유지 */
-	}
-	a:hover {
-		color:#ffb2b2;
-	}
+		body {
+			text-align: center;
+			width: 60%; /* 너비를 60%로 통일 */
+			max-width: 800px;
+			margin: 40px auto; /* 상단 여백 추가 */
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			color: #333;
+		}
+
+		.card {
+			background-color: #fff;
+			border: 1px solid #e0e0e0;
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+			margin-bottom: 15px;
+			overflow: hidden;
+		}
+
+		.question-item {
+			display: flex;
+			justify-content: space-between; /* 양 끝 정렬 */
+			align-items: center; /* 세로 중앙 정렬 */
+			padding: 15px 25px;
+			border-bottom: 1px solid #f0f0f0;
+		}
+
+		.question-item:last-child {
+			border-bottom: none;
+		}
+
+		a {
+			text-decoration: none;
+			color: inherit; /* 부모 요소의 색상 상속 */
+			flex-grow: 1; /* 링크가 가능한 공간을 모두 차지하도록 함 */
+			text-align: left; /* 제목 왼쪽 정렬 */
+			transition: color 0.3s ease;
+		}
+		
+		a h2 {
+			font-size: 20px;
+			margin: 0;
+			color: #2c3e50;
+		}
+
+		a:hover h2 {
+			color: #007bff; /* 호버 시 파란색으로 변경 */
+		}
+
+		.date {
+			font-size: 14px;
+			color: #888;
+			white-space: nowrap; /* 줄바꿈 방지 */
+			margin-left: 20px;
+		}
+
+		.button-section {
+			margin-top: 30px;
+		}
+
 		.question-button {
-			background-color: #dddddd;
-			padding:10px;
-			border-radius: 10px;
-			border: 1px solid #b3b3b3;
-			text-decoration:none;
+			display: inline-block;
+			background-color: #007bff;
+			color: white;
+			padding: 12px 25px;
+			border-radius: 8px;
+			border: none;
+			font-size: 17px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.3s ease, transform 0.2s ease;
 		}
-		.button-class{
-			border:none;
-		}
-		.button-class a:hover{
-			color:#493cff;
+
+		.question-button:hover {
+			background-color: #0056b3;
+			transform: translateY(-2px);
 		}
 	</style>
 </head>
-<body>
-	<div th:each="q, loop: ${qlist}">
-		<a th:href="@{|/detail/${q.id}|}">
-			<h2 th:text="${q.subject}"></h2>
-		</a>
-		<a>
-			<h4 th:text="${q.createDate}"></h4>
-		</a>
+<body> -->
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+	<div class="card">
+		<div class="question-item" th:each="q, loop: ${qlist}">
+			<a th:href="@{|/detail/${q.id}|}">
+				<h2 th:text="${q.subject}"></h2>
+			</a>
+			<span class="date" th:text="${q.createDate}"></span>
+		</div>
 	</div>
-	<div class="button-class">
+
+	<div class="button-section">
 		<a th:href="@{/create}" class="question-button">질문 등록하기</a>
 	</div>
-</body>
+<!-- </body> -->
+</div>
 </html>
-
-
-
-

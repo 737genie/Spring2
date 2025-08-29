@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.example.demo.answer.AnswerForm;
 import com.example.demo.question.QuestionForm;
 
 import jakarta.validation.Valid;
@@ -60,7 +61,8 @@ public class ReviewController {
 	}
 	
 	@GetMapping("/detail/{id}")
-	public String detail(@PathVariable("id") Integer id, Model model) {
+	public String detail(@PathVariable("id") Integer id, Model model,
+			AnswerForm answerForm) {
 		Question q = this.questionService.getQuestion(id);
 		model.addAttribute("question", q);
 		return "review/detail";

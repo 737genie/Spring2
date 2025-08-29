@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
@@ -7,64 +7,177 @@
 	<style>
 		body {
 			text-align: center;
-			width:50%;
-			margin:auto;
-		}
-		div {
-			margin-top:30px;
-			border: 3px solid #c2c2c2;
-			border-radius: 10px;
+			width: 60%; /* 너비 조정으로 좀 더 넓게 */
+			max-width: 800px; /* 최대 너비 설정 */
+			margin: 40px auto; /* 상단 여백 추가 */
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 폰트 변경 */
+			color: #333; /* 기본 텍스트 색상 */
 		}
 		
-		h1{
-			margin:0;
-			padding:20px;
-			border-bottom: 1px solid #c2c2c2;
+		.card {
+			background-color: #fff;
+			border: 1px solid #e0e0e0; /* 테두리 얇게 */
+			border-radius: 12px; /* 둥근 모서리 강조 */
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 부드러운 그림자 */
+			margin-bottom: 25px; /* 각 섹션 하단 여백 */
+			overflow: hidden; /* 내용이 넘칠 경우 처리 */
+			text-align: left; /* 카드 내부 텍스트 왼쪽 정렬 */
+		}
+
+		.question-section {
+			padding: 25px;
+		}
+		
+		.question-header {
+			padding-bottom: 15px;
+			border-bottom: 1px solid #f0f0f0; /* 얇은 구분선 */
+			margin-bottom: 15px;
+		}
+
+		.question-header h1 {
+			font-size: 28px; /* 질문 제목 크기 */
+			color: #2c3e50;
+			margin: 0;
+			padding: 0;
+		}
+
+		.question-content {
+			font-size: 18px; /* 질문 내용 크기 */
+			line-height: 1.6;
+			color: #555;
+			margin-bottom: 20px;
+		}
+
+		.question-date {
+			font-size: 13px;
+			color: #888;
+			text-align: right; /* 날짜 오른쪽 정렬 */
+		}
+		
+		.answer-count {
+			font-size: 22px;
+			color: #34495e;
+			margin-bottom: 20px;
+			font-weight: 600;
+			text-align: left;
+			padding-left: 10px; /* 왼쪽 여백 추가 */
+		}
+
+		.answer-list ul {
+			list-style: none; /* 리스트 점 제거 */
+			padding: 0;
+			margin: 0;
+		}
+
+		.answer-item {
+			padding: 20px 25px;
+			border-bottom: 1px solid #f7f7f7; /* 답변 사이 구분선 */
+			font-size: 16px;
+			line-height: 1.5;
+			color: #444;
+		}
+
+		.answer-item:last-child {
+			border-bottom: none;
+		}
+		
+		.form-section {
+			padding: 25px;
+		}
+
+		form {
+			display: block; /* 인라인 그리드 대신 블록으로 변경 */
+			width: 100%;
+			box-sizing: border-box; /* 패딩, 보더가 너비에 포함 */
+			border: 1px solid #aed6b8; /* 부드러운 초록색 테두리 */
+			border-radius: 12px;
+			padding: 20px;
+			background-color: #f9fdfa; /* 옅은 배경색 */
+		}
+
+		textarea {
+			width: calc(100% - 20px); /* 패딩 고려 */
+			height: 120px;
+			padding: 15px;
+			margin-top: 15px; /* 상단 여백 조정 */
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			resize: vertical; /* 세로 크기 조절만 허용 */
+			font-size: 16px;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		}
 		
 		button {
-			margin-top:10px;
-			border-radius: 10px;
-			border: 1px solid #999999;
-			text-decoration: none;
-			padding: 8px;
-			font-size: 15px;
+			display: inline-block; /* 버튼 정렬을 위해 */
+			padding: 12px 25px;
+			margin-top: 20px;
+			border-radius: 8px; /* 버튼 모서리 둥글게 */
+			border: none; /* 기본 테두리 제거 */
+			background-color: #007bff; /* 파란색 계열 버튼 */
+			color: white;
+			font-size: 17px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.3s ease, transform 0.2s ease; /* 호버 애니메이션 */
 		}
 		.answer-button:hover {
-			color: #ffffff;
-			background-color: #4732ff;
-			border: 1px solid #4732ff;
+			background-color: #0056b3; /* 호버 시 색상 변경 */
+			transform: translateY(-2px); /* 살짝 위로 이동 */
 		}
 		
-		a{
-			margin-top: 20px;
-			font-size: 15px;
-		}
-		
-		.list {
-			margin-top:30px;
-			border:none;
+		.back-to-list {
+			margin-top: 35px;
+			font-size: 16px;
 		}
 
-		
+		.back-to-list a {
+			color: #007bff;
+			text-decoration: none;
+			font-weight: 500;
+			transition: color 0.3s ease;
+		}
+
+		.back-to-list a:hover {
+			color: #0056b3;
+			text-decoration: underline;
+		}
+
 	</style>
 </head>
-<body>
+<body> -->
 
-	<div>
-		<h1 th:text="${question.subject}"></h1>
-		<h2 th:text="${question.content}"></h2>
-		<h6 th:text="${question.createDate}"></h6>
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+
+	<div class="card question-section">
+		<div class="question-header">
+			<h1 th:text="${question.subject}">질문 제목이 들어갑니다</h1>
+		</div>
+		<p class="question-content" th:text="${question.content}">질문 내용이 여기에 상세하게 들어갑니다. 여러 줄로 길어질 수도 있습니다.</p>
+		<p class="question-date" th:text="${question.createDate}">2025-08-29 09:52</p>
 	</div>
 	
-	<form th:action="@{|/answer/create|}" method="post">
-		<button type="submit" class="answer-button">답변 등록</button>
-	</form>
+	<h3 class="answer-count" th:text="|답변 ${#lists.size(question.answerList)}개|">답변 0개</h3>
+	
+	<div class="card answer-list">
+		<ul>
+			<li th:each="answer: ${question.answerList}" class="answer-item" th:text="${answer.content}">답변 내용이 여기에 표시됩니다.</li>
+		</ul>
+	</div>
+	
+	<div class="card form-section">
+		<form th:action="@{|/answer/create/${question.id}|}" th:object="${answerForm}" method="post">
+			<div th:replace="~{form_errors :: formErrorsFragment}"></div>
+			
+			<textarea th:field="*{content}" rows="7" placeholder="여기에 답변을 입력하세요."></textarea>
+			<button type="submit" class="answer-button">답변 등록</button>
+		</form>
+	</div>
 
-	<div class="list">
+	<div class="back-to-list">
 		<a th:href="@{/list}">목록으로 돌아가기</a>
 	</div>
 
-</body>
+<!-- </body> -->
+</div>
 </html>
-
