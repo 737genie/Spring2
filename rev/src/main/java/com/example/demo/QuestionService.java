@@ -6,7 +6,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demo.User.SiteUser;
 import com.example.demo.exceptions.NoneDataException;
+import com.example.demo.question.QuestionForm;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,12 +32,21 @@ public class QuestionService {
 		
 	}
 
-	public void createQuestion(String subject, String content) {
+	public void createQuestion(String subject, String content, SiteUser user) {
 		Question q = new Question();
 		q.setSubject(subject);
 		q.setContent(content);
 		q.setCreateDate(LocalDateTime.now());
+		q.setAuthor(user);
 		this.questionRepository.save(q);
 	}
+
+	public void modify(Question q, String subject, String content) {
+		q.setSubject(subject);
+		q.setContent(content);
+		q.setModifyDate(LocalDateTime.now());
+		this.questionRepository.save(q);
+	}
+
 	
 }

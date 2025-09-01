@@ -1,0 +1,19 @@
+<html layout:decorate="~{layout}">
+<div layout:fragment="content">
+
+
+<form th:action="@{/user/login}" method="post">
+	<div>
+		<label for="username">사용자 ID</label>
+		<input type="text" name="username">
+	</div>
+	<div>
+		<label for="password">비밀번호</label>
+		<input type="password" name="password">
+	</div>
+	<button type="submit">로그인</button>
+</form>
+
+
+</div>
+</html>

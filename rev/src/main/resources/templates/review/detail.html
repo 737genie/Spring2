@@ -157,6 +157,10 @@
 		<p class="question-date" th:text="${question.createDate}">2025-08-29 09:52</p>
 	</div>
 	
+	<a th:href="@{|/modify/${question.id}|}" sec:authorize="isAuthenticated()"
+	th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}" 
+	th:text="수정"></a>
+	
 	<h3 class="answer-count" th:text="|답변 ${#lists.size(question.answerList)}개|">답변 0개</h3>
 	
 	<div class="card answer-list">
@@ -171,6 +175,7 @@
 			
 			<textarea th:field="*{content}" rows="7" placeholder="여기에 답변을 입력하세요."></textarea>
 			<button type="submit" class="answer-button">답변 등록</button>
+			<a th:href="@{|/modify/${question.id}|}">질문 수정하기</a>
 		</form>
 	</div>
 

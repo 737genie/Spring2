@@ -42,12 +42,15 @@ public class UserController {
 		userService.create(
 				userCreateForm.getUsername(),
 				userCreateForm.getPassword1(),
-				userCreateForm.getPassword2(),
 				userCreateForm.getEmail()
 				);
 		return "redirect:/";
 		
 	}
 	
+	@GetMapping("/login")
+	public String login() {
+		return "log_in";
+	}
 	
 }
