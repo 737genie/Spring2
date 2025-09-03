@@ -1,0 +1,42 @@
+<!-- /templates/logs/edit-form.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>업적 수정</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-yellow-50 flex items-center justify-center min-h-screen">
+<div class="w-full max-w-lg p-8 bg-white rounded-xl shadow-lg">
+    <h1 class="text-3xl font-bold text-center mb-6 text-yellow-900">업적 수정하기</h1>
+    
+    <!-- 수정 Form -->
+    <form th:action="@{/{id}/edit(id=${log.id})}" th:object="${logForm}" method="post" class="space-y-6">
+        <div class="text-center p-4 bg-yellow-100 rounded-lg">
+             <p class="text-sm text-yellow-800">증거 사진은 역사의 일부이므로 수정할 수 없습니다.</p>
+        </div>
+        <div>
+            <label for="activity" class="block text-sm font-medium text-gray-700">미루기 활동</label>
+            <input type="text" id="activity" th:field="*{activity}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-yellow-400 focus:border-yellow-400" required>
+        </div>
+        <div>
+            <label for="thoughts" class="block text-sm font-medium text-gray-700">그때의 심정</label>
+            <textarea id="thoughts" th:field="*{thoughts}" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-yellow-400 focus:border-yellow-400" required></textarea>
+        </div>
+        
+        <!-- 버튼 영역: 수정/취소 버튼 -->
+        <div class="flex justify-end space-x-4 pt-4">
+            <a th:href="@{/}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-5 rounded-full">취소</a>
+            <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold py-2 px-5 rounded-full">수정 완료</button>
+        </div>
+    </form>
+
+    <!-- 삭제 Form: 수정 Form과 분리 -->
+    <div class="border-t mt-6 pt-4">
+        <form th:action="@{/{id}/delete(id=${log.id})}" method="post" onsubmit="return confirm('이 위대한 업적을 정말로 삭제하시겠습니까?');" class="text-left">
+            <button type="submit" class="text-sm text-red-500 hover:text-red-700 font-semibold">이 기록 삭제하기</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!-- /templates/layout/header.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header th:fragment="header" class="bg-yellow-800 text-white shadow-lg sticky top-0 z-10">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a th:href="@{/}" class="text-2xl font-extrabold tracking-wider">
+            미루기 명예의 전당
+        </a>
+        <nav class="flex items-center space-x-6">
+            <!-- 로그인한 경우 -->
+            <a th:href="@{/new}" sec:authorize="isAuthenticated()" class="hover:text-yellow-300">새 업적 등록</a>
+            <div sec:authorize="isAuthenticated()" class="flex items-center space-x-4">
+                <span class="font-semibold"><span sec:authentication="name"></span> 전문가님</span>
+                <form th:action="@{/users/logout}" method="post">
+                    <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-md font-semibold">로그아웃</button>
+                </form>
+            </div>
+            <!-- 로그인하지 않은 경우 -->
+            <div sec:authorize="isAnonymous()">
+                <a th:href="@{/users/login}" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-md font-semibold">로그인</a>
+                <a th:href="@{/users/signup}" class="bg-gray-200 hover:bg-gray-300 text-yellow-900 px-4 py-2 rounded-md font-semibold">회원가입</a>
+            </div>
+        </nav>
+    </div>
+</header>
+</html>

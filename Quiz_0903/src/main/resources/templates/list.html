@@ -1,0 +1,33 @@
+<!-- /templates/logs/list.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>누렁이의 미루기 명예의 전당</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-yellow-50">
+<div th:replace="~{/header :: header}"></div>
+<div class="container mx-auto p-8">
+     <header class="text-center mb-12">
+        <h1 class="text-5xl font-extrabold text-yellow-900 tracking-tight">위대한 미루기 명예의 전당</h1>
+        <p class="text-gray-500 mt-2">오늘의 게으름을 내일로 미루지 말자!</p>
+    </header>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div th:each="log : ${logs}" class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+            <img th:src="@{/images/{filename}(filename=${log.storedFileName})}" alt="증거사진" class="w-full h-56 object-cover">
+            <div class="p-6 flex-grow">
+                <p class="text-sm text-gray-400">전문가: <span class="font-semibold" th:text="${log.author.username}"></span></p>
+                <h2 class="text-2xl font-bold text-yellow-800 mt-1" th:text="${log.activity}"></h2>
+                <p class="mt-2 text-gray-600 italic" th:text="|“${log.thoughts}”|"></p>
+            </div>
+            <!-- TODO: 현재 로그인한 사용자가 이 기록의 주인인 경우에만 수정 버튼이 보이도록 하세요. -->
+            <div class="p-4 bg-gray-50 text-right"
+                 th:if="${#authentication != null and #authentication.name == log.author.username}">
+                 <a th:href="@{/{id}/edit(id=${log.id})}" class="text-sm text-yellow-600 hover:text-yellow-800 font-semibold">수정</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
