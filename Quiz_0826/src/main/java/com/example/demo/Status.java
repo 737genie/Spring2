@@ -10,6 +10,7 @@ public enum Status {
     IN_TRANSIT("배송 중"),
     DELIVERED("배달 완료");
 
+    
     private final String description;
 }
 
