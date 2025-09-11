@@ -34,7 +34,7 @@ public class AnomalyController {
 	@PostMapping("/anomalies/new")
 	public String anomalyCreate(AnomalyCreateDto anomaly) {
 		anomalyService.save(anomaly);
-		return "new-form";
+		return "redirect:/anomalies";
 	}
 	
 	

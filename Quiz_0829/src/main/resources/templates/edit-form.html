@@ -12,15 +12,15 @@
         <form th:action="@{/memories/{id}/edit(id=${memory.id})}" th:object="${memory}" method="post" class="space-y-6 text-lg">
             <!-- Form Fields (new-form과 동일) -->
             <div class="flex items-center justify-between pt-4">
-                <form th:action="@{/memories/{id}/delete(id=${memory.id})}" method="post" onsubmit="return confirm('이 기억을 정말로 잊어버릴거야?')">
-                    <button type="submit" class="px-5 py-2 font-medium text-white bg-red-500 rounded-md hover:bg-red-600">잊어버리기</button>
-                </form>
                 <div class="space-x-3">
                     <a th:href="@{/memories}" class="px-5 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">취소</a>
                     <button type="submit" class="px-5 py-2 font-semibold text-white bg-[#FFA726] rounded-md hover:bg-[#FB8C00]">수정 완료</button>
                 </div>
             </div>
         </form>
+                <form th:action="@{/memories/{id}/delete(id=${memory.id})}" method="post" onsubmit="return confirm('이 기억을 정말로 잊어버릴거야?')">
+                    <button type="submit" class="px-5 py-2 font-medium text-white bg-red-500 rounded-md hover:bg-red-600">잊어버리기</button>
+                </form>
     </div>
 </body>
 </html>

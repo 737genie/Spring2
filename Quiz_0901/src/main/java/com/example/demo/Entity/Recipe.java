@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.Entity;
 
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 
@@ -13,12 +13,14 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 public class Recipe {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,10 +31,10 @@ public class Recipe {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private SiteUser user;
 
     @Builder
-    public Recipe(String name, String description, User user) {
+    public Recipe(String name, String description, SiteUser user) {
         this.name = name;
         this.description = description;
         this.user = user;

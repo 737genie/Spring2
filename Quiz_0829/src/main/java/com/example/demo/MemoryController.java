@@ -43,13 +43,31 @@ public class MemoryController {
 		return "redirect:/memories";
 	}
 	
-	@PostMapping("/memories/{id}/edit(id=${memory.id})")
+	@GetMapping("/memories/{id}/edit")
+	public String updateMemory(Model model,
+			@PathVariable("id") Long id) throws Exception {
+		
+		Memory m = this.memoryService.getMemory(id);
+		model.addAttribute("memory", m);
+		
+		return "edit-form";
+	}
+	
+	@PostMapping("/memories/{id}/edit")
 	public String updateMemory(Model model,
 			@PathVariable("id") Long id,
-			MemoryForm memoryForm) {
+			MemoryForm memoryForm) throws Exception {
 		
-		memoryService.update(id, memoryForm);
+		Memory m = this.memoryService.getMemory(id);
+		memoryService.update(m, memoryForm);
 		
+		return "redirect:/memories";
+	}
+	
+	
+	@PostMapping("/memories/{id}/delete")
+	public String deleteMemory(@PathVariable("id") Long id) {
+		memoryService.delete(id);
 		return "redirect:/memories";
 	}
 }

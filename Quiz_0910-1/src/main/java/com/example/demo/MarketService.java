@@ -12,8 +12,12 @@ import lombok.RequiredArgsConstructor;
 public class MarketService {
 	private final MarketRepository marketRepository;
 
-	public List<Market> getList() {
-		return this.marketRepository.findAll();
+	public List<Market> getList(String keyword) {
+		if(keyword == null || keyword.isBlank()) {
+			return this.marketRepository.findAll();
+		} else {
+			return this.marketRepository.findKeyword(keyword);
+		}
 	}
 
 	public void save(MarketForm marketForm) {

@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.Entity;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;

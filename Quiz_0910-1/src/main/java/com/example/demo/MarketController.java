@@ -8,6 +8,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,8 +18,10 @@ public class MarketController {
 	private final MarketService marketService;
 	
 	@GetMapping("/")
-	public String root(Model model) {
-		List<Market> list = this.marketService.getList();
+	public String root(@RequestParam(value = "keyword", required = false) String keyword
+	,Model model) {
+		List<Market> list = this.marketService.getList(keyword);
+		model.addAttribute("keyword", keyword);
 		model.addAttribute("items", list);
 		return "items/list";
 	}
