@@ -35,13 +35,13 @@ public class FlexComment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private FlexUser user;
+    private FlexUser flexUser;
 
     @Builder
-    public FlexComment(String content, Flex flex, FlexUser user) {
+    public FlexComment(String content, Flex flex, FlexUser flexUser) {
         this.content = content;
         this.flex = flex;
-        this.user = user;
+        this.flexUser = flexUser;
         this.createdAt = LocalDateTime.now();
     }
 }

@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "flexusers")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+//(access = AccessLevel.PROTECTED)
 public class FlexUser {
 
     @Id

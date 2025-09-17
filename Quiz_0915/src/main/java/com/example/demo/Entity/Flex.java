@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+//(access = AccessLevel.PROTECTED)
 public class Flex {
 
     @Id
@@ -30,14 +31,14 @@ public class Flex {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private FlexUser user;
+    private FlexUser flexUser;
 
     @Builder
-    public Flex(String title, String content, String imageFileName, FlexUser user) {
+    public Flex(String title, String content, String imageFileName, FlexUser flexUser) {
         this.title = title;
         this.content = content;
         this.imageFileName = imageFileName;
-        this.user = user;
+        this.flexUser = flexUser;
         this.createdAt = LocalDateTime.now();
     }
 

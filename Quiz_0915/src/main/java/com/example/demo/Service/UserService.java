@@ -23,6 +23,10 @@ public class UserService {
 		
 		this.userRepository.save(user);
 	}
+
+	public FlexUser getUser(String name) {
+		return this.userRepository.findByUsername(name).get();
+	}
 	
 	
 }

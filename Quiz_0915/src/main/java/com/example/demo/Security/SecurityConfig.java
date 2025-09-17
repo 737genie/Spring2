@@ -22,7 +22,11 @@ public class SecurityConfig {
 		http.authorizeHttpRequests((authorizeHttpRequests)
 				-> authorizeHttpRequests
 				.requestMatchers(new AntPathRequestMatcher("/**"))
+//						new AntPathRequestMatcher("/"),
+//						new AntPathRequestMatcher("/users/login"),
+//						new AntPathRequestMatcher("/users/signup"))
 				.permitAll())
+//				.anyRequest().authenticated())
 				.csrf((csrf) -> csrf
 						.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
 				.headers((headers) -> headers
@@ -33,7 +37,7 @@ public class SecurityConfig {
 			    		.defaultSuccessUrl("/")
 			    		)
 			    .logout((logout) -> logout
-			    		.logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
+			    		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 			    		.logoutSuccessUrl("/")
 			    		.invalidateHttpSession(true)
 			    		)

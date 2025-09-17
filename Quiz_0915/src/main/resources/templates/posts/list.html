@@ -29,9 +29,9 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <a th:each="post : ${posts.content}" th:href="@{/posts/{id}(id=${post.id})}" class="block bg-black border border-gray-700 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2">
-            <img th:src="@{/uploads/{filename}(filename=${post.imageFileName})}" class="w-full h-60 object-cover">
+            <img th:src="@{/images/{filename}(filename=${post.imageFileName})}" class="w-full h-60 object-cover">
             <div class="p-5">
-                <p class="text-sm text-gray-400">도전자: <span th:text="${post.user.username}"></span></p>
+                <p class="text-sm text-gray-400">도전자: <span th:text="${post.flexUser.username}"></span></p>
                 <h2 class="text-2xl font-bold text-yellow-400 mt-1 truncate" th:text="${post.title}"></h2>
                 <p class="mt-3 text-gray-400 h-12 overflow-hidden" th:text="${post.content}"></p>
             </div>

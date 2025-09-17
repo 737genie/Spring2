@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <meta charset="UTF-8">
     <title th:text="${post.title}"></title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,11 +18,11 @@
         <!-- 수정된 부분: postId를 전달하기 위한 hidden input 추가 -->
         <input type="hidden" id="postId" th:value="${post.id}">
 
-        <p class="text-sm text-gray-400">도전자: <span th:text="${post.user.username}"></span></p>
+        <p class="text-sm text-gray-400">도전자: <span th:text="${post.flexUser.username}"></span></p>
         <h1 class="text-4xl font-extrabold text-yellow-400 my-4" th:text="${post.title}"></h1>
-        <img th:src="@{/uploads/{filename}(filename=${post.imageFileName})}" class="w-full rounded-lg my-6">
+        <img th:src="@{/images/{filename}(filename=${post.imageFileName})}" class="w-full rounded-lg my-6">
         <p class="text-lg text-gray-300 whitespace-pre-wrap" th:text="${post.content}"></p>
-        <div class="mt-6 text-right" th:if="${#authentication != null and #authentication.name == post.user.username}">
+        <div class="mt-6 text-right" th:if="${#authentication != null and #authentication.name == post.flexUser.username}">
              <a th:href="@{/posts/{id}/edit(id=${post.id})}" class="text-sm text-yellow-400 hover:text-yellow-300 font-semibold">이 글 수정하기</a>
         </div>
     </div>
@@ -74,10 +76,17 @@
         const content = commentContentInput.value.trim();
         if (!content) return;
         
+		// 폼에서 CSRF 토큰 값 가져오기
+		        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+		        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+		
+		
+		
         try {
             const response = await fetch(`/api/posts/${postId}/comments`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json',
+				[csrfHeader]: csrfToken },
                 body: JSON.stringify({ content: content })
             });
             if (!response.ok) throw new Error('댓글 등록에 실패했습니다.');

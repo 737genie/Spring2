@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +19,7 @@ import com.example.demo.Entity.Flex;
 import com.example.demo.Entity.FlexUser;
 import com.example.demo.Repository.FlexRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,8 +28,8 @@ public class FlexService {
 	private final FlexRepository flexRepository;
 	private String fileDir = "C:\\uploads\\";
 
-
-	public void create(PostDto postDto, MultipartFile file, FlexUser user) throws IllegalStateException, IOException {
+	@Transactional
+	public void create(PostDto postDto, MultipartFile file, FlexUser flexUser) throws IllegalStateException, IOException {
 		
 		String originalFileName = null;
 		String storedFileName = null;
@@ -43,18 +47,36 @@ public class FlexService {
 		Flex flex = Flex.builder()
 				.title(postDto.getTitle())
 				.content(postDto.getContent())
-				.user(user)
-				.imageFileName(originalFileName)
+				.flexUser(flexUser)
+				.imageFileName(storedFileName)
 				.build();
+		
+		this.flexRepository.save(flex);
 	}
 
-	public Page<Flex> findAll() {
+	public Page<Flex> findAll(String keyword, int page) {
 		List<Sort.Order> sorts = new ArrayList<>();
 		sorts.add(Sort.Order.desc("createdAt"));
+		Pageable pageable = PageRequest.of(page, 3, Sort.by(sorts));
 		
-		
-		return null;
+		Specification<Flex> spec = FlexSpecification.search(keyword);
+
+		return flexRepository.findAll(spec, pageable);
 	}
+
+	public Flex detail(Long id) {
+		return this.flexRepository.findById(id).get();
+	}
+
+	@Transactional
+	public void edit(PostDto postDto, Flex flex) {
+		flex.update(postDto.getTitle(), postDto.getContent());
+	}
+
+	public void delete(Long id) {
+		this.flexRepository.deleteById(id);
+	}
+
 	
 	
 }
