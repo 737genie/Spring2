@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,17 +23,19 @@ public class DreamApiController {
 	
 	
 	@GetMapping("/projects/check-code")
-	public ResponseEntity<?> checkCode(CodeCheckRequestDto codeCheckRequestDto) {
+	public ResponseEntity<?> getCode(CodeCheckRequestDto codeCheckRequestDto) {
 		return ResponseEntity.status(HttpStatus.OK).body(codeCheckRequestDto);
 	}
 	@PostMapping("/projects/check-code")
-	public ResponseEntity<?> checkCode(CodeCheckRequestDto codeReqDto,
-			CodeCheckResponseDto codeResDto) {
+	public ResponseEntity<?> checkCode(@RequestBody CodeCheckRequestDto codeReqDto) {
 		
 		boolean checkCode = this.dreamProjectService.checkActivationCodeExists(codeReqDto.getActivationCode());
 		
+		CodeCheckResponseDto codeResDto = new CodeCheckResponseDto();
 		codeResDto.setExists(checkCode);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(codeResDto);
+		
+		
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.demo.Entity.DreamFragment;
 import com.example.demo.Service.DreamProjectService;
@@ -22,5 +23,10 @@ public class DreamProjectController {
 		List<DreamFragment> fragment = this.dreamProjectService.findNullFrag();
 		model.addAttribute("unassignedFragments", fragment);
 		return "home";
+	}
+	
+	@PostMapping("/workshop/find-fragments")
+	public String react() {
+		return "redirect:/workshop";
 	}
 }

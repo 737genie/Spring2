@@ -9,7 +9,6 @@ import com.example.demo.Entity.DreamProject;
 @Repository
 public interface DreamProjectRepository extends JpaRepository<DreamProject, Long>{
 	
-	@Query("SELECT activationCode FROM DreamProject")
 	Boolean existsByActivationCode(String activationCode);
 
 

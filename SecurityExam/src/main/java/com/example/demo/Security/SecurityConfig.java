@@ -14,17 +14,27 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.Service.ClubUserDetailsService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+	
+    private final ClubUserDetailsService clubUserDetailsService;
+    private final ClubAuthenticationSuccessHandler successHandler;
+    private final ClubAuthenticationFailureHandler failureHandler;
 	
 	@Bean
 	public SecurityFilterChain clubFilterChain(HttpSecurity http) throws Exception{
@@ -39,7 +49,7 @@ public class SecurityConfig {
 				// .sessionCreationPolicy(...) -> 세션생성정책
 				// If_REQUIRED : 필요할 때만 세션 생성하도록 설정
 				// 필요함의 기준 : 인증이 필요할때
-				// ALWAYS, NEVER, STATELESS 등
+				// ALWAYS, NEVER, STATELESS 등   STATELESS 무상태 (JWT)
 				// maximumSessions(1) : 한 사용자가 동시에 유지할 수 있는 세션
 				// maxSessionsPreventsLogin : 최대 세션 수를 초과 했을 때 어떻게 동작할 것인가를 정의
 				// false : 이전 세션 만료 -> 새로운 로그인 허용
@@ -49,6 +59,7 @@ public class SecurityConfig {
 						.maximumSessions(1)
 						.maxSessionsPreventsLogin(false)
 						)
+				// 권한 주려면 PreAuthorize를 같이 써야한다 ~~ 
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/", "/club/login", "club/register",
 								"/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
@@ -165,5 +176,12 @@ public class SecurityConfig {
             request.getSession().setAttribute("errorMessage", errorMessage);
             response.sendRedirect("/club/login?error=true");
         }
+    }
+    
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // 셜록 누렁: "BCrypt로 비밀번호를 안전하게 암호화합니다용!"
+        return new BCryptPasswordEncoder(12); // strength를 12로 설정하여 더 강력한 암호화
     }
 }

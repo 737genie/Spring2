@@ -24,9 +24,11 @@ public class DreamProjectService {
 
 
 	public Boolean checkActivationCodeExists(String activationCode) {
-		CodeCheckResponseDto codeResDto = new CodeCheckResponseDto();
-		Boolean isExists = this.dreamProjectRepository.existsByActivationCode(activationCode);
-		return Boolean.TRUE.equals(isExists);
+		if(this.dreamProjectRepository.existsByActivationCode(activationCode)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	

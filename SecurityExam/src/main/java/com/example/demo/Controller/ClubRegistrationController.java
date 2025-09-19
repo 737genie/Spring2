@@ -7,12 +7,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.example.demo.Domain.ClubUserRegistrationDto;
+import com.example.demo.Service.ClubUserService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class ClubRegistrationController {
+	
+	private final ClubUserService clubUserService;
 	
 	@GetMapping("/club/register")
 	public String signup(Model model) {
@@ -40,7 +45,7 @@ public class ClubRegistrationController {
         }
         
         try {
-            userService.registerNewUser(registrationDto);
+            clubUserService.registerNewUser(registrationDto);
             model.addAttribute("success", true); // view단에 성공상태를 우선 저장
             return "redirect:/club/login?success";
             
