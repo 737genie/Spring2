@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,97 +20,216 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.JWT.JwtTokenProvider;
+import com.example.demo.OAuth2.OAuth2AuthenticationFailureHandler;
+import com.example.demo.OAuth2.OAuth2AuthenticationSuccessHandler;
 import com.example.demo.Service.ClubUserDetailsService;
+import com.example.demo.Service.CustomOAuth2UserService;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 	
     private final ClubUserDetailsService clubUserDetailsService;
     private final ClubAuthenticationSuccessHandler successHandler;
     private final ClubAuthenticationFailureHandler failureHandler;
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final OAuth2AuthenticationSuccessHandler oauth2SuccessHandler;
+	private final OAuth2AuthenticationFailureHandler oauth2FailureHandler;
+	private final JwtTokenProvider jwtTokenProvider;
+
 	
-	@Bean
 	public SecurityFilterChain clubFilterChain(HttpSecurity http) throws Exception{
 		
+		
+		
 		return http
-				.csrf(csrf -> {
-					csrf.disable(); // 개발단계
-					// 운영단계 :
-//					csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-				})
-				// 세션관리 & 세션 설정 정의할 때 사용
-				// .sessionCreationPolicy(...) -> 세션생성정책
-				// If_REQUIRED : 필요할 때만 세션 생성하도록 설정
-				// 필요함의 기준 : 인증이 필요할때
-				// ALWAYS, NEVER, STATELESS 등   STATELESS 무상태 (JWT)
-				// maximumSessions(1) : 한 사용자가 동시에 유지할 수 있는 세션
-				// maxSessionsPreventsLogin : 최대 세션 수를 초과 했을 때 어떻게 동작할 것인가를 정의
-				// false : 이전 세션 만료 -> 새로운 로그인 허용
-				// true : 새로운 로그인 차단 & 기존 세션 유지
-				.sessionManagement(session -> session
-						.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-						.maximumSessions(1)
-						.maxSessionsPreventsLogin(false)
-						)
-				// 권한 주려면 PreAuthorize를 같이 써야한다 ~~ 
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/", "/club/login", "club/register",
-								"/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-						.requestMatchers("/club/vip/**").hasRole("VIP")
-						.requestMatchers("/club/admin/**").hasRole("ADMIN")
-						.requestMatchers("/club/secret/**").hasAuthority("SECRET_ACCESS")
-						.anyRequest().authenticated()
-						)
-				.formLogin(form -> form
+				.csrf(csrf->csrf.disable())
+				// HTTP Basic 인증 비활성화
+				// HTTP Basic 인증 : 사용자 이름, 비밀번호를 인코딩 하여 전송하는 단순 인증 방식
+				// -> 보안상 취약점이 이미 많이 드러남
+				.httpBasic(httpBasic -> httpBasic.disable())
+				// 폼 로그인 비활성화 
+				// -> 전통적인 시큐리티 기반의 로그인을 비활성화
+				// --> REST API 구조에서 많이 활용
+				.formLogin(formLogin -> formLogin.disable())
+				// 세션 생성하지 않음, 각 요청을 독립적으로 처리, 서버에 상태 정보 저장 안 함
+                .sessionManagement(session -> session
+                		// JWT 사용을 위해 STATELESS로 설정
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) 
+                    )
+                .authorizeHttpRequests(auth -> auth
+                      // 누구나 접근 가능한 공개 구역
+                      .requestMatchers("/", "/club/login", "/club/register", 
+                                     "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                      
+                      // VIP 회원 전용 구역  
+                      .requestMatchers("/club/vip/**").hasRole("VIP")
+                      
+                      // 관리자 전용 구역
+                      .requestMatchers("/club/admin/**").hasRole("ADMIN")
+                      
+                      // 특별 권한이 필요한 구역
+                      .requestMatchers("/club/secret/**").hasAuthority("SECRET_ACCESS")
+                      
+                      // 나머지는 인증 필요
+                      .anyRequest().authenticated()
+                  )				
+				.oauth2Login(oauth2 -> oauth2
 						.loginPage("/club/login")
-						.loginProcessingUrl("/club/authentication")
-						.usernameParameter("username")
-						.passwordParameter("password")
-						.defaultSuccessUrl("/club/main", true)
-						.failureUrl("/club/login?error=true")
-						.successHandler(successHandler)              // 성공 핸들러
-	                    .failureHandler(failureHandler)
-	                    .permitAll()
+						.userInfoEndpoint(userInfo -> userInfo
+								.userService(customOAuth2UserService)
+								// 커스텀 유저서비스를 만들었기 때문에 시큐리티가 정확하게 인식할수 있도록
+								// customUserservice 객체를 인식.
 						)
-				// Logout 설정 (퇴장 처리용!)
-                .logout(logout -> logout
-                    .logoutUrl("/club/logout")                   // 로그아웃 URL
-                    .logoutSuccessUrl("/club/login?logout=true") // 로그아웃 성공 시 이동할 페이지
-                    .invalidateHttpSession(true)                // 세션 무효화
-                    .deleteCookies("JSESSIONID")                // 쿠키 삭제
-                    .clearAuthentication(true)                  // 인증 정보 삭제
-                    .permitAll()
-                )
-               // 예외 처리 설정
-                .exceptionHandling(ex -> ex
-                		// 인증되지 않은 사용자가 접근 시도 시
-                		// 해당 요청 URI를 로그에 출력
+						.successHandler(oauth2SuccessHandler)
+						.failureHandler(oauth2FailureHandler)			
+				)
+				.logout(logout -> logout.disable()) // 불필요
+                
+				// JWT 필터 추가
+				
+				.exceptionHandling(ex -> ex
+                		// 인증되지 않은 사용자가 접근을 시도했다면
+                		// 해당 요청 URI를 로그에 출력.
                     .authenticationEntryPoint((request, response, authException) -> {
                         System.out.println("인증되지 않은 접근 시도: " + request.getRequestURI());
                         response.sendRedirect("/club/login");
                     })
+                    // 사용자가 권한이 부족한 상태에서 특정 리소스에 접근하려할때 호출
                     .accessDeniedHandler((request, response, accessDeniedException) -> {
                         System.out.println("권한 없는 접근 시도: " + request.getRequestURI());
                         response.sendRedirect("/club/access-denied");
                     })
                 )
-             // Remember Me 기능 (선택사항)
+                // Remember Me 기능 (선택사항)
+                // -> 사용자의 인증 정보를 어느기간동안 유지할지 설정.
                 .rememberMe(remember -> remember
                     .key("clubSecretKey")
-                    .tokenValiditySeconds(7 * 24 * 60 * 60) // 7일 초단위
-                    .userDetailsService(clubUserDetailsService)
+                    .tokenValiditySeconds(7 * 24 * 60 * 60) // 7일
+                    // 사용자 정보를 조회하는데 사용할 UserDetailsService를 설정할때 사용.
+                    .userDetailsService(clubUserDetailsService) 
                 )
-                
-		.build();
+                .build();
 	}
+	
+	
+	
+//	@Bean
+//	public SecurityFilterChain clubFilterChain(HttpSecurity http) throws Exception{
+//		
+//		// CSRF 설정(개발단계에서는 일단 꺼두세요. 
+//		return http
+//				.csrf(csrf -> {
+//					csrf.disable();
+//					// 이건 실제로 운영할때 이렇게 설정하면 좋음
+//					//csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+//				})
+//				// 세션 관리와 세션 관련 설정을 정의할때 사용
+//				// .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//				//   -> 세션 생성 정책을 설정하는 메서드
+//				//   -> SessionCreationPolicy.IF_REQUIRED : 필요할때만 세션을 생성하도록 설정
+//				//      필요함의 기준 : 인증이 필요할때만. 
+//				//   ALWAYS, NEVER, STATELESS 등등이 있음.
+//				
+//				// .maximumSessions(1) : 한 사용자가 동시에 유지할수 있는 세션.
+//				// .maxSessionsPreventsLogin : 최대 세션수를 초과했을때 어떻게 동작할것인가를 정의.
+//				//  false : 이전 세션이 만료 -> 새로운 로그인 허용
+//				//  true : 새로운 로그인을 차단하고 기존 세션을 유지.
+//				.sessionManagement(session -> session
+//						.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//						.maximumSessions(1)
+//						.maxSessionsPreventsLogin(false)
+//						)
+//                .authorizeHttpRequests(auth -> auth
+//                        // 누구나 접근 가능한 공개 구역
+//                        .requestMatchers("/", "/club/login", "/club/register", 
+//                                       "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+//                        
+//                        // VIP 회원 전용 구역  
+//                        .requestMatchers("/club/vip/**").hasRole("VIP")
+//                        
+//                        // 관리자 전용 구역
+//                        .requestMatchers("/club/admin/**").hasRole("ADMIN")
+//                        
+//                        // 특별 권한이 필요한 구역
+//                        .requestMatchers("/club/secret/**").hasAuthority("SECRET_ACCESS")
+//                        
+//                        // 나머지는 인증 필요
+//                        .anyRequest().authenticated()
+//                    )				
+//				.formLogin(form -> form
+//						.loginPage("/club/login")
+//						// 로그인폼에서 제출된 데이터를 처리할 URL을 지정함.
+//						.loginProcessingUrl("/club/authenticate")
+//						// 로그인폼에서 사용자의 아이디와 비밀번호를 받을 input 필드의 이름을 지정.
+//						.usernameParameter("username")
+//						.passwordParameter("password")
+//						// ,true의 의미 : 항상 이 URL로 '리다이렉트' 강제화.
+//						.defaultSuccessUrl("/club/main", true)
+//						.failureUrl("/club/login?error=true")
+//	                    .successHandler(successHandler)              // 성공 핸들러
+//	                    .failureHandler(failureHandler)              // 실패 핸들러
+//	                    .permitAll()
+//						)
+//				.oauth2Login(oauth2 -> oauth2
+//						.loginPage("/club/login")
+//						.userInfoEndpoint(userInfo -> userInfo
+//								.userService(customOAuth2UserService)
+//								// 커스텀 유저서비스를 만들었기 때문에 시큐리티가 정확하게 인식할수 있도록
+//								// customUserservice 객체를 인식.
+//						)
+//						.successHandler(oauth2SuccessHandler)
+//						.failureHandler(oauth2FailureHandler)			
+//				)
+//				
+//				
+//                // Logout 설정 (퇴장 처리용!)
+//                .logout(logout -> logout
+//                    .logoutUrl("/club/logout")                   // 로그아웃 URL
+//                    .logoutSuccessUrl("/club/login?logout=true") // 로그아웃 성공 시 이동할 페이지
+//                    .invalidateHttpSession(true)                // 세션 무효화
+//                    .deleteCookies("JSESSIONID")                // 쿠키 삭제
+//                    .clearAuthentication(true)                  // 인증 정보 삭제
+//                    .permitAll()
+//                )				
+//
+//                // 예외 처리 설정
+//                .exceptionHandling(ex -> ex
+//                		// 인증되지 않은 사용자가 접근을 시도했다면
+//                		// 해당 요청 URI를 로그에 출력.
+//                    .authenticationEntryPoint((request, response, authException) -> {
+//                        System.out.println("인증되지 않은 접근 시도: " + request.getRequestURI());
+//                        response.sendRedirect("/club/login");
+//                    })
+//                    // 사용자가 권한이 부족한 상태에서 특정 리소스에 접근하려할때 호출
+//                    .accessDeniedHandler((request, response, accessDeniedException) -> {
+//                        System.out.println("권한 없는 접근 시도: " + request.getRequestURI());
+//                        response.sendRedirect("/club/access-denied");
+//                    })
+//                )
+//                // Remember Me 기능 (선택사항)
+//                // -> 사용자의 인증 정보를 어느기간동안 유지할지 설정.
+//                .rememberMe(remember -> remember
+//                    .key("clubSecretKey")
+//                    .tokenValiditySeconds(7 * 24 * 60 * 60) // 7일
+//                    // 사용자 정보를 조회하는데 사용할 UserDetailsService를 설정할때 사용.
+//                    .userDetailsService(clubUserDetailsService) 
+//                )
+//		.build();
+//		
+//	}
+	
 	
     /**
      * 셜록 누렁의 성공 핸들러용!
@@ -144,6 +264,8 @@ public class SecurityConfig {
             response.sendRedirect("/club/main");
         }
 
+
+
     }
 
     /**
@@ -151,8 +273,6 @@ public class SecurityConfig {
      */
     @Component
     public static class ClubAuthenticationFailureHandler implements AuthenticationFailureHandler {
-        
-  
 
         @Override
         public void onAuthenticationFailure(HttpServletRequest request, 
@@ -176,12 +296,13 @@ public class SecurityConfig {
             request.getSession().setAttribute("errorMessage", errorMessage);
             response.sendRedirect("/club/login?error=true");
         }
+
+
     }
-    
-    
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        // 셜록 누렁: "BCrypt로 비밀번호를 안전하게 암호화합니다용!"
-        return new BCryptPasswordEncoder(12); // strength를 12로 설정하여 더 강력한 암호화
-    }
+	
+	
+	 
+	
+	
+	
 }
