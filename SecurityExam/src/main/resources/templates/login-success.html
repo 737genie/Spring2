@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login Success</title>
+    <script>
+        // 페이지 로드 시 URL에서 JWT 토큰을 추출합니다.
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        // 토큰이 존재하면 로컬 스토리지에 저장하고 메인 페이지로 리디렉션합니다.
+        if (token) {
+            console.log('JWT found in URL, storing in localStorage...');
+            localStorage.setItem('jwt', token);
+            console.log('Redirecting to /club/main');
+            // URL에서 토큰을 제거하고 메인 페이지로 이동하여 주소창을 깔끔하게 유지합니다.
+            window.location.replace('/club/main');
+        } else {
+            console.error('JWT token not found in URL query parameters.');
+            // 토큰이 없으면 로그인 페이지로 보냅니다.
+            window.location.replace('/club/login');
+        }
+    </script>
+</head>
+<body>
+    <p>Processing login...</p>
+</body>
+</html>

@@ -1,26 +1,40 @@
 package com.example.demo.JWT;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtTokenProvider {
 	private final SecretKey key;
 	private final long validityInMilliseconds;
 	
-	public JwtTokenProvider(SecretKey key, long validityInMilliseconds) {
-		this.key = key;
-		this.validityInMilliseconds = validityInMilliseconds;
-	}
+    public JwtTokenProvider(@Value("${jwt.secret:DefaultSecretKeyDefaultSecretKeyDefaultSecretKeyDefaultSecretKey}") String secretKey,
+            @Value("${jwt.expiration:3600000}") long validityInMilliseconds) {
+    		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+    		this.key = Keys.hmacShaKeyFor(keyBytes);
+    		this.validityInMilliseconds = validityInMilliseconds;
+}
 	
 	public String createToken(Authentication authentication) {
 		String authorities = authentication.getAuthorities().stream()
@@ -30,7 +44,6 @@ public class JwtTokenProvider {
 		// 토큰 유효기간 지정
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.validityInMilliseconds);
-        
         
         // subject : 토큰의 주체 설정
         // claim : 사용자의 권한 정보를 저장할 때 씀
@@ -63,12 +76,49 @@ public class JwtTokenProvider {
 				.parseSignedClaims(token)
 				.getPayload();
 		
+		// 권한 가져오기
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get("auth").toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
 		
-		return null;
+		
+//      Optional.ofNullable(claims.get("auth"))
+//      .map(Object::toString)
+//      .map(auth -> auth.split(","))
+//      .map(Arrays::stream)
+//      .filter(StringUtils::hasText)
+//      .map(SimpleGrantedAuthority::new)
+//      .collect(Collectors.toList());
+        
+        
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
+		return new UsernamePasswordAuthenticationToken(principal, token, authorities);
 	}
 	
-	public boolean validateToken() {
+	// JWT 토큰 검증 영역
+	public boolean validateToken(String token) {
 		
+		// JWT 파싱을 위한 새로운 파서 빌더 생성
+		// -> JWT 서명을 검증하는데 사용할 비밀 키 설정
+		// -> 설정된 옵션으로 JWT 파서 생성
+		// -> 주어진 JWT 토큰 문자열 파싱 후 서명 검증
+		try {
+			Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+			return true;
+		} catch(io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+			System.out.println("잘못된 JWT 시그니처입니다.");
+		} catch(ExpiredJwtException e) {
+			System.out.println("만료된 토큰입니다.");
+		} catch(UnsupportedJwtException e) {
+			System.out.println("지원하지 않는 JWT 토큰입니다.");
+		} catch(IllegalArgumentException e){
+			System.out.println("지원하지 않는 토큰 형식입니다.");
+		} catch(Exception e) {
+			System.out.println("error");
+		}
+		
+		return false;
 	}
 	
 }

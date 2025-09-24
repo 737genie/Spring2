@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,9 +21,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.JWT.JwtAuthenticationFilter;
 import com.example.demo.JWT.JwtTokenProvider;
 import com.example.demo.OAuth2.OAuth2AuthenticationFailureHandler;
 import com.example.demo.OAuth2.OAuth2AuthenticationSuccessHandler;
@@ -98,6 +101,24 @@ public class SecurityConfig {
 				.logout(logout -> logout.disable()) // 불필요
                 
 				// JWT 필터 추가
+				// addFilterBefore : 기존 시큐리티 필터 체인에 특정한 필터를 추가할 때 사용
+				// (추가할 필터, 기준이 되는 필터)
+				
+//		        SecurityContext 로드
+//		        ↓
+//		        CORS, CSRF 보안 처리
+//		        ↓
+//		        JwtAuthenticationFilter (우리가 추가한 필터)
+//		        ↓
+//		        UsernamePasswordAuthenticationFilter (기본 폼 로그인 필터)  
+//		        ↓
+//		        권한 검사 필터들
+//		        ↓
+//		        최종 컨트롤러 실행
+				
+				.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), 
+						UsernamePasswordAuthenticationFilter.class)
+				
 				
 				.exceptionHandling(ex -> ex
                 		// 인증되지 않은 사용자가 접근을 시도했다면

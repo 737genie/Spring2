@@ -4,6 +4,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.Service.ClubUserDetailsService;
 
@@ -14,6 +15,13 @@ import lombok.RequiredArgsConstructor;
 public class ClubMainController {
 	
 	private final ClubUserDetailsService userDetailsService;
+	
+    @GetMapping("/login-success")
+    public String loginSuccess(@RequestParam("token") String token, Model model) {
+        model.addAttribute("token", token);
+        return "login-success";
+    }
+	
 	
 	@GetMapping("/club/main")
 	public String main(Authentication authentication,

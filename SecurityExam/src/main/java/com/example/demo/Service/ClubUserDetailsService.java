@@ -81,7 +81,11 @@ public class ClubUserDetailsService implements UserDetailsService{
 
 
 
-	
+    // 사용자 정보 조회 메서드
+    public ClubUser findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+    }
 	
 	
 	
